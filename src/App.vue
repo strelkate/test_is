@@ -4,18 +4,25 @@
       <h3 class="md-title">Система комментариев</h3>
     </md-toolbar>
     <div class="app__container">
+      <div class="app__top">
+        <h1 class="app__title">Комментарии</h1>
+        <md-button href="#comment-new" class="md-primary">Добавить комментарий</md-button>
+      </div>
+
       <CommentItem/>
+      <NewComment/>
     </div>
   </div>
 </template>
 
 <script>
 
-import CommentItem from "./components/CommentItem";
+import CommentItem from "./components/ItemComment";
+import NewComment from "@/components/NewComment";
 
 export default {
   name: 'App',
-  components: {CommentItem},
+  components: {NewComment, CommentItem},
 }
 </script>
 
@@ -42,6 +49,18 @@ body {
   &__container {
     max-width: 750px;
     margin: auto;
+  }
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+  &__title {
+    font-weight: 700;
+    font-size: 35px;
+    line-height: 50px;
+    color: #262D33;
   }
 }
 
