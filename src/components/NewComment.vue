@@ -2,23 +2,23 @@
   <div id="comment-new" class="comment-new">
     <div class="comment-new__title">Что вы думаете на этот счет?</div>
     <div class="comment-new__wrapper">
-      <md-field :class="messageError">
+      <md-field>
         <label>Выберите фото для автара</label>
-        <md-file v-model="avatar" accept="image/*"/>
+        <md-file @change="handleAvatarUpload" v-model="comment.avatarPath" accept="image/*"></md-file>
       </md-field>
-      <md-field :class="messageError">
+      <md-field :class="emailInvalidClass">
         <label>Введите Email</label>
-        <md-input v-model="email" required></md-input>
+        <md-input v-model="comment.email" @input="onInputEmail" required></md-input>
         <span class="md-error">Введите корректный email</span>
       </md-field>
-      <md-field :class="messageError">
+      <md-field :class="nameInvalidClass">
         <label>Введите Ваше Имя</label>
-        <md-input v-model="name" required></md-input>
+        <md-input v-model="comment.name" @input="onInputName" required></md-input>
         <span class="md-error">Имя обязательно для заполнения</span>
       </md-field>
-      <md-field :class="messageError">
+      <md-field :class="textInvalidClass">
         <label>Ваш комментарий</label>
-        <md-textarea v-model="textarea" required></md-textarea>
+        <md-textarea v-model="comment.text" @input="onInputText" required></md-textarea>
         <span class="md-error">Комментарий обязателен для заполнения</span>
       </md-field>
     </div>
@@ -27,25 +27,91 @@
 </template>
 
 <script>
+import {mapActions} from "vuex";
+
+const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+function getDefaultComment() {
+  return {
+    avatar: null,
+    avatarPath: '',
+    email: '',
+    name: '',
+    date: '',
+    text: '',
+    likeNumber: 0
+  }
+}
+
 export default {
   name: "NewComment",
   data() {
     return {
-      avatar: null,
-      email: '',
-      name: '',
-      textarea: '',
-      valid: false
+      comment: getDefaultComment(),
+      isEmailValid: true,
+      isNameValid: true,
+      isTextValid: true,
     }
   },
   computed: {
-    // messageError() {
-    //   return {'md-invalid': this.valid}
-    // }
+    emailInvalidClass() {
+      if (!this.isEmailValid) {
+        return 'md-invalid'
+      }
+      return ''
+    },
+    nameInvalidClass() {
+      if (!this.isNameValid) {
+        return 'md-invalid'
+      }
+      return ''
+    },
+    textInvalidClass() {
+      if (!this.isTextValid) {
+        return 'md-invalid'
+      }
+      return ''
+    }
   },
   methods: {
+    ...mapActions(['ADD_COMMENT']),
+    isFormValid() {
+      let valid = true
+      if (!this.comment.email.match(validEmailRegex)) {
+        this.isEmailValid = false
+        valid = false
+      }
+      if (this.comment.name === '') {
+        this.isNameValid = false
+        valid = false
+      }
+      if (this.comment.text === '') {
+        this.isTextValid = false
+        valid = false
+      }
+
+      return valid
+    },
+    onInputEmail() {
+      this.isEmailValid = true
+    },
+    onInputName() {
+      this.isNameValid = true
+    },
+    onInputText() {
+      this.isTextValid = true
+    },
     onSubmitClick() {
-      // this.valid = true
+      if (!this.isFormValid()) return
+      this.comment.date = Date.now()
+      this.ADD_COMMENT(this.comment)
+      this.comment = getDefaultComment()
+    },
+    handleAvatarUpload(e) {
+      e.preventDefault()
+      const file = e.target.files[0]
+      if (file == null) return
+      this.comment.avatar = URL.createObjectURL(file)
     }
   }
 }

@@ -8,8 +8,7 @@
         <h1 class="app__title">Комментарии</h1>
         <md-button href="#comment-new" class="md-primary">Добавить комментарий</md-button>
       </div>
-
-      <CommentItem/>
+      <CommentItem v-for="(comment, index) in GET_COMMENTS" :key="index" :comment="comment"/>
       <NewComment/>
     </div>
   </div>
@@ -19,10 +18,14 @@
 
 import CommentItem from "./components/ItemComment";
 import NewComment from "@/components/NewComment";
+import {mapGetters} from "vuex";
 
 export default {
   name: 'App',
   components: {NewComment, CommentItem},
+  computed: {
+    ...mapGetters(['GET_COMMENTS'])
+  }
 }
 </script>
 
